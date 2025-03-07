@@ -1,0 +1,45 @@
+# Ignore sensitive files and unnecessary directories
+.env
+db/password.txt
+db/init-db.sh
+
+# Ignore macOS system files
+**/.DS_Store
+
+# Ignore Python cache and virtual environments
+**/__pycache__
+**/.venv
+
+# Ignore Java and Eclipse project files
+**/.classpath
+**/.project
+**/.settings
+
+# Ignore Git-related files
+**/.git
+
+# Ignore Visual Studio Code settings
+**/.vs
+**/.vscode
+
+# Ignore build artifacts and logs
+**/bin
+**/obj
+**/node_modules
+**/npm-debug.log
+
+# Ignore IDE-specific files
+**/*.*proj.user
+**/*.dbmdl
+**/*.jfm
+
+# Ignore Helm charts and Kubernetes files
+**/charts
+**/secrets.dev.yaml
+**/values.dev.yaml
+
+# Ignore JetBrains IDEs (IntelliJ, PyCharm, WebStorm, etc.)
+.idea/
+*.iml
+out/
+/db/init-db.sh
