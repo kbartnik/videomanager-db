@@ -1,7 +1,7 @@
 # Ignore sensitive files and unnecessary directories
+
+db/
 .env
-db/password.txt
-db/init-db.sh
 
 # Ignore macOS system files
 **/.DS_Store

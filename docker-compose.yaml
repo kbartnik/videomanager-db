@@ -1,15 +1,17 @@
 services:
   db:
     image: postgres:latest
-    restart: always
+    restart: unless-stopped
     user: postgres
     secrets:
-      - db-password
+      - readonly-password
+      - dev-password
+      - shell-user-password
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+      - POSTGRES_PASSWORD_FILE=/run/secrets/dev-password
     ports:
       - "127.0.0.1:5432:5432"
     healthcheck:
@@ -20,7 +22,16 @@ services:
 
 volumes:
   db-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ~/postgres-data
 
 secrets:
-  db-password:
-    file: db/password.txt
+  readonly-password:
+    file: db/readonly-password.txt
+  dev-password:
+    file: db/dev-password.txt
+  shell-user-password:
+    file: scripts/shell-user-password.txt

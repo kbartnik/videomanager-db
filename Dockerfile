@@ -12,15 +12,17 @@ RUN useradd -m -s /bin/bash dev
 # Set the environment variables for PostgreSQL
 # Use ARG to pass the password securely during build time
 ARG POSTGRES_PASSWORD
-ENV POSTGRES_USER=dev
+ENV POSTGRES_USER=dev_user
 ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-ENV POSTGRES_DB=videomanager
+ENV POSTGRES_DB=video_manager
 
-# Copy the custom initialization script
-COPY init-db.sh /docker-entrypoint-initdb.d/
+# Copy the custom initialization scripts
+COPY db/init-db.sh /docker-entrypoint-initdb.d/
+COPY scripts/create-shell-user.sh /docker-entrypoint-initdb.d/
 
-# Change permissions on the custom initialization script
+# Change permissions on the custom initialization scripts
 RUN chmod +x /docker-entrypoint-initdb.d/init-db.sh
+RUN chmod +x /docker-entrypoint-initdb.d/create-shell-user.sh
 
 # Expose the default PostgreSQL port
 EXPOSE 5432
