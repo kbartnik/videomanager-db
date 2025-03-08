@@ -1,37 +1,23 @@
+version: '3.8'
+
 services:
   db:
-    image: postgres:latest
-    restart: unless-stopped
-    user: postgres
-    secrets:
-      - readonly-password
-      - dev-password
-      - shell-user-password
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_PASSWORD_FILE=/run/secrets/dev-password
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "127.0.0.1:5432:5432"
-    healthcheck:
-      test: [ "CMD", "pg_isready" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: trackeruser
+      POSTGRES_PASSWORD: trackerpass
+      POSTGRES_DB: videomanager
 
-volumes:
+olumes:
   db-data:
     driver: local
     driver_opts:
       type: none
       o: bind
       device: ~/postgres-data
-
-secrets:
-  readonly-password:
-    file: db/readonly-password.txt
-  dev-password:
-    file: db/dev-password.txt
-  shell-user-password:
-    file: scripts/shell-user-password.txt
