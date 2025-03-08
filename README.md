@@ -7,10 +7,7 @@ This project sets up a PostgreSQL database for the VideoManager application usin
 ```
 videomanager_db/
 ├── db/
-│   ├── password.txt
-│   ├── readonly-password.txt
-│   ├── dev-password.txt
-│   └── init-db.sh
+│   └── init.sql
 ├── .env
 ├── .gitignore
 ├── .dockerignore
@@ -38,25 +35,12 @@ cd videomanager_db
 Create a `.env` file in the project root with the following content:
 
 ```env
-POSTGRES_DB=video_manager
-POSTGRES_USER=dev_user
+POSTGRES_DB=videomanager
+POSTGRES_USER=trackeruser
+POSTGRES_PASSWORD=trackerpass
 ```
 
-### 3. Create the Password Files
-
-Create `readonly-password.txt` and `dev-password.txt` files inside the `db` directory with the PostgreSQL passwords. These files will be used as Docker secrets:
-
-```plaintext
-# filepath: readonly-password.txt
-your_readonly_password_here
-```
-
-```plaintext
-# filepath: dev-password.txt
-your_dev_password_here
-```
-
-### 4. Build and Run the Containers
+### 3. Build and Run the Containers
 
 Use Docker Compose to build and run the containers:
 
@@ -64,7 +48,7 @@ Use Docker Compose to build and run the containers:
 docker-compose up -d
 ```
 
-### 5. Verify the Setup
+### 4. Verify the Setup
 
 Check the logs to ensure the PostgreSQL service is running correctly:
 
@@ -74,14 +58,11 @@ docker-compose logs db
 
 ## Custom Initialization Script
 
-The `init-db.sh` script performs the following tasks:
+The `init.sql` script performs the following tasks:
 
-- Drops the default `postgres` database.
-- Drops the default `postgres` user.
-- Creates the `video_manager` and `video_manager_dev` databases.
-- Creates the `readonly_user` and `dev_user` roles with appropriate permissions.
-- Logs the start and completion of the script.
-- Deletes the script after execution to prevent re-running.
+- Drops existing tables if they already exist (for development purposes).
+- Creates the `videomanager` database schema, including tables for users, categories, videos, and comments.
+- Inserts initial data into the tables.
 
 ## Health Check
 
@@ -89,11 +70,11 @@ The PostgreSQL service includes a health check to monitor its readiness. The hea
 
 ## Persistent Data Storage
 
-The PostgreSQL data is stored in a named volume (`db-data`) to ensure data is not lost when the container is restarted.
+The PostgreSQL data is stored in a named volume (`db_data`) to ensure data is not lost when the container is restarted.
 
 ## Secure Password Management
 
-The PostgreSQL passwords are managed using Docker secrets. The passwords are stored in the `db/readonly-password.txt` and `db/dev-password.txt` files and are not hardcoded in the `Dockerfile` or `docker-compose.yaml`.
+The PostgreSQL passwords are managed using environment variables defined in the `.env` file. These passwords are not hardcoded in the `Dockerfile` or `docker-compose.yaml`.
 
 ## Cleanup
 
@@ -119,4 +100,4 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 
 ## Contact
 
-For any questions or support, please contact [Kurt  Bartnik](mailto:kbartnik@gmail.com).
+For any questions or support, please contact [Kurt Bartnik](mailto:kbartnik@gmail.com).

@@ -28,11 +28,13 @@
 **/node_modules
 **/npm-debug.log
 **/obj
-**/secrets.dev.yaml
-**/values.dev.yaml
 LICENSE
 README.md
 
-# Add the following entries to ignore sensitive files and unnecessary directories
-db/password.txt
-db/init-db.sh
+# Secrets should not be committed to the repository. Use dummy filenames for reference.
+# Do not commit secrets to the repository. Filenames below for reference only.
+# They are essential for production but not necessarily for development.
+# Example entries:
+# secrets/db-password.txt
+# secrets/api-key.txt
+# secrets/oauth-token.txt

@@ -14,8 +14,8 @@ services:
       POSTGRES_PASSWORD: trackerpass
       POSTGRES_DB: videomanager
 
-olumes:
-  db-data:
+volumes:
+  db_data:
     driver: local
     driver_opts:
       type: none

@@ -1,6 +1,5 @@
 # Ignore sensitive files and unnecessary directories
 
-db/
 .env
 
 # Ignore macOS system files
@@ -42,4 +41,3 @@ db/
 .idea/
 *.iml
 out/
-/db/init-db.sh
