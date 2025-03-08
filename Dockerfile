@@ -1,31 +1,29 @@
 # syntax=docker/dockerfile:1
 
-# Use the official PostgreSQL image as the base image
+# Use the official PostgreSQL image as the base
 FROM postgres:latest
 
-# Update existing apt-get packages
-RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
-
-# Create a non-privileged user named 'dev'
-RUN useradd -m -s /bin/bash dev
-
 # Set the environment variables for PostgreSQL
-# Use ARG to pass the password securely during build time
-ARG POSTGRES_PASSWORD
-ENV POSTGRES_USER=dev_user
-ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-ENV POSTGRES_DB=video_manager
+# Set PostgreSQL user from environment (development only)
+ENV POSTGRES_USER=${POSTGRES_USER}
+# Set the database name from environment (development only)
+ENV POSTGRES_DB=${POSTGRES_DB}
+# Path for secrets if using in production
+ENV POSTGRES_PASSWORD_FILE=/run/secrets/postgres-password
 
-# Copy the custom initialization scripts
-COPY db/init-db.sh /docker-entrypoint-initdb.d/
-COPY scripts/create-shell-user.sh /docker-entrypoint-initdb.d/
+# Create the directories for the custom scripts
+RUN mkdir -p /docker-entrypoint-initdb.d
+
+# Copy the custom initialization scripts (will mount the local directory in docker-compose)
+# If there are additional scripts needed at build time, they can be copied here.
+# For example:
+# COPY db/init-db.sh /docker-entrypoint-initdb.d/
 
 # Change permissions on the custom initialization scripts
-RUN chmod +x /docker-entrypoint-initdb.d/init-db.sh
-RUN chmod +x /docker-entrypoint-initdb.d/create-shell-user.sh
+RUN chmod 755 /docker-entrypoint-initdb.d/init-db.sh
 
 # Expose the default PostgreSQL port
-EXPOSE 5432
+EXPOSE 5432  
 
-# Set the default command to run PostgreSQL
-CMD ["postgres"]
+# CMD is acknowledged by the base image as the default command to run PostgreSQL
+CMD ["postgres"]  # This will start PostgreSQL server
