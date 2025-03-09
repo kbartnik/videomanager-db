@@ -1,5 +1,10 @@
 -- Switch to the videomanager database
-CREATE DATABASE IF NOT EXISTS videomanager;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = 'videomanager') THEN
+        PERFORM dblink_exec('dbname=postgres', 'CREATE DATABASE videomanager');
+    END IF;
+END $$;
 
 -- Connect to the videomanager database
 \connect videomanager;
@@ -11,7 +16,7 @@ DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS users;
 
 -- Create users table
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     user_id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,  -- Store hashed passwords for production
@@ -21,7 +26,7 @@ CREATE TABLE users (
 );
 
 -- Create categories table
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
     category_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
@@ -30,9 +35,9 @@ CREATE TABLE categories (
 );
 
 -- Create videos table
-CREATE TABLE videos (
+CREATE TABLE IF NOT EXISTS videos (
     video_id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL UNIQUE,
     description TEXT,
     url VARCHAR(255) NOT NULL,
     category_id INT REFERENCES categories(category_id) ON DELETE SET NULL,
@@ -42,7 +47,7 @@ CREATE TABLE videos (
 );
 
 -- Create comments table
-CREATE TABLE comments (
+CREATE TABLE IF NOT EXISTS comments (
     comment_id SERIAL PRIMARY KEY,
     video_id INT REFERENCES videos(video_id) ON DELETE CASCADE,
     user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
@@ -60,20 +65,29 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create triggers for each table
-CREATE TRIGGER update_users_updated_at
-BEFORE UPDATE ON users
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'update_users_updated_at') THEN
+        CREATE TRIGGER update_users_updated_at
+        BEFORE UPDATE ON users
+        FOR EACH ROW
+        EXECUTE FUNCTION update_updated_at_column();
+    END IF;
 
-CREATE TRIGGER update_categories_updated_at
-BEFORE UPDATE ON categories
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'update_categories_updated_at') THEN
+        CREATE TRIGGER update_categories_updated_at
+        BEFORE UPDATE ON categories
+        FOR EACH ROW
+        EXECUTE FUNCTION update_updated_at_column();
+    END IF;
 
-CREATE TRIGGER update_videos_updated_at
-BEFORE UPDATE ON videos
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'update_videos_updated_at') THEN
+        CREATE TRIGGER update_videos_updated_at
+        BEFORE UPDATE ON videos
+        FOR EACH ROW
+        EXECUTE FUNCTION update_updated_at_column();
+    END IF;
+END $$;
 
 -- Insert some initial data into the categories table
 DO $$
